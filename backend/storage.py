@@ -17,7 +17,7 @@ def connect():
 
 
 def save(request, result):
-    record = {**result, "id": str(uuid.uuid4()), "created_at": datetime.now(timezone.utc).isoformat(), "previous_assessment_id": request.previous_assessment_id}
+    record = {**result, "id": str(uuid.uuid4()), "created_at": datetime.now(timezone.utc).isoformat(), "previous_assessment_id": request.previous_assessment_id, "inputs": request.model_dump(mode="json")}
     with connect() as conn:
         conn.execute("INSERT INTO assessments VALUES (?,?,?,?)", (record["id"], record["created_at"], request.model_dump_json(), json.dumps(record)))
     return record
@@ -25,8 +25,12 @@ def save(request, result):
 
 def get(record_id):
     with connect() as conn:
-        row = conn.execute("SELECT result FROM assessments WHERE id=?", (record_id,)).fetchone()
-    return json.loads(row[0]) if row else None
+        row = conn.execute("SELECT result, request FROM assessments WHERE id=?", (record_id,)).fetchone()
+    if not row:
+        return None
+    result = json.loads(row[0])
+    result.setdefault("inputs", json.loads(row[1]))
+    return result
 
 
 def history():
