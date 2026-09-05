@@ -118,7 +118,8 @@ def assess(request: AssessmentRequest) -> dict:
     digest_payload["transactions"] = sorted(digest_payload["transactions"], key=lambda t: (t["date"], t["transaction_id"]))
     digest = hashlib.sha256(json.dumps(digest_payload, sort_keys=True).encode()).hexdigest()
     for m in months.values():
-        m["minimum_observed_balance"] = min(m.pop("balances")) if m["balances"] else None
+        observed = m.pop("balances")
+        m["minimum_observed_balance"] = min(observed) if observed else None
         for key, value in m.items():
             if isinstance(value, float):
                 m[key] = round(value, 2)
