@@ -1,0 +1,2509 @@
+{
+  "status": "complete",
+  "dataset": "UCI Taiwan Default of Credit Card Clients",
+  "source": "https://archive.ics.uci.edu/static/public/350/default+of+credit+card+clients.zip",
+  "source_page": "https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients",
+  "license": "CC BY 4.0",
+  "attribution": "Yeh, I. (2009). Default of Credit Card Clients. UCI Machine Learning Repository. DOI: 10.24432/C55S3H.",
+  "created_at": "2026-09-05T17:42:49.491054+00:00",
+  "source_sha256": "56c885f84457f6680f8438f02bfcdac9579323d8a94465ee5f26e32baa727602",
+  "target": "Default payment next month, as supplied by UCI; not a Malaysian or 12-month default estimate.",
+  "selection": "Two candidates per model and feature set; tune on validation AUC, Platt-calibrate on separate validation subset; select final model by validation AUC.",
+  "split_method": "60/20/20 approximately stratified, grouped by identical permitted feature profiles. No reliable borrower application dates; this is not temporal validation.",
+  "audit": {
+    "rows": 30000,
+    "unique_ids": 30000,
+    "adverse_outcomes": 6636,
+    "missing_feature_cells": 0,
+    "duplicate_feature_profiles": 817,
+    "train": 18002,
+    "validation_tuning": 2999,
+    "validation_calibration": 2999,
+    "test": 6000,
+    "test_adverse_outcomes": 1327,
+    "train_adverse_outcomes": 3982,
+    "validation_adverse_outcomes": 1327,
+    "group_overlap": 0
+  },
+  "limitations": [
+    "Taiwan credit-card customers in 2005; no evidence of Malaysian worker or microbusiness performance.",
+    "Static comparator contains credit limit only. It is a deliberately limited comparator, not a lender's conventional scorecard.",
+    "Behavioural variables are monthly card repayment/bill/payment histories, not bank-account cash flow.",
+    "Sex, education, marriage, age and identifiers are excluded from predictive features; exclusion does not establish fairness.",
+    "Approved borrowers only: this cannot validate outcomes for historically rejected applicants.",
+    "95% bootstrap intervals measure test-sample uncertainty conditional on fitted models, not training or country-shift uncertainty.",
+    "Matched-volume results are retrospective ranking comparisons. Frozen validation thresholds are reported separately; ties can change achieved approval rates.",
+    "Feature contributions explain base-model log odds, not causal effects or additive changes in calibrated probabilities."
+  ],
+  "selected_model": "behavioural-CatBoost",
+  "bootstrap_rounds": 200,
+  "seed": 2026,
+  "versions": {
+    "python": "3.12.8",
+    "sklearn": "1.9.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10"
+  },
+  "results": [
+    {
+      "id": "static-Logistic regression",
+      "model": "Logistic regression",
+      "feature_set": "static",
+      "features": [
+        "LIMIT_BAL"
+      ],
+      "chosen_candidate": 0,
+      "validation_auc": 0.6238465025103824,
+      "metrics": {
+        "roc_auc": 0.6090330202637576,
+        "pr_auc": 0.29731776692784595,
+        "brier": 0.16856875275167754
+      },
+      "confidence_intervals": {
+        "roc_auc": [
+          0.5941278012525113,
+          0.6257944735172781
+        ],
+        "pr_auc": [
+          0.27686504037866916,
+          0.3132279445931747
+        ],
+        "brier": [
+          0.16240448551385234,
+          0.17383185172099402
+        ]
+      },
+      "calibration": [
+        {
+          "predicted": 0.09630029198492204,
+          "observed": 0.16116751269035534
+        },
+        {
+          "predicted": 0.1500645929634838,
+          "observed": 0.15824468085106383
+        },
+        {
+          "predicted": 0.185530034778068,
+          "observed": 0.16470588235294117
+        },
+        {
+          "predicted": 0.21473340461224752,
+          "observed": 0.16416040100250626
+        },
+        {
+          "predicted": 0.24821079633547857,
+          "observed": 0.23465211459754434
+        },
+        {
+          "predicted": 0.28388282248012053,
+          "observed": 0.26275704493526275
+        },
+        {
+          "predicted": 0.306697299368917,
+          "observed": 0.35195530726256985
+        },
+        {
+          "predicted": 0.3170197801274587,
+          "observed": 0.3671399594320487
+        }
+      ],
+      "policy_points": [
+        {
+          "target_approval": 0.3,
+          "validation_threshold": 0.18475629214185843,
+          "test_approval": 0.31983333333333336,
+          "test_adverse_rate": 0.15893694632621158,
+          "adverse_rate_ci": [
+            0.14326192952477013,
+            0.1759747668312896
+          ],
+          "approved_count": 1919,
+          "matched_volume_adverse_rate": 0.16166666666666665,
+          "matched_volume_count": 1800
+        },
+        {
+          "target_approval": 0.5,
+          "validation_threshold": 0.22744221156968045,
+          "test_approval": 0.5171666666666667,
+          "test_adverse_rate": 0.16210119239445697,
+          "adverse_rate_ci": [
+            0.1495528546052096,
+            0.175485151838376
+          ],
+          "approved_count": 3103,
+          "matched_volume_adverse_rate": 0.15866666666666668,
+          "matched_volume_count": 3000
+        },
+        {
+          "target_approval": 0.7,
+          "validation_threshold": 0.26922685130682134,
+          "test_approval": 0.6906666666666667,
+          "test_adverse_rate": 0.18194980694980695,
+          "adverse_rate_ci": [
+            0.1704995269665821,
+            0.1939892230377575
+          ],
+          "approved_count": 4144,
+          "matched_volume_adverse_rate": 0.18333333333333332,
+          "matched_volume_count": 4200
+        }
+      ],
+      "samples": [
+        {
+          "borrower_id": "3",
+          "actual_outcome": 0,
+          "probability": 0.26193689298159534,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.2578464776690965
+            }
+          ]
+        },
+        {
+          "borrower_id": "12",
+          "actual_outcome": 0,
+          "probability": 0.15824635267697174,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 260000.0,
+              "contribution": -0.3075492140126952
+            }
+          ]
+        },
+        {
+          "borrower_id": "15",
+          "actual_outcome": 0,
+          "probability": 0.1632889582759845,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 250000.0,
+              "contribution": -0.2742906439137663
+            }
+          ]
+        },
+        {
+          "borrower_id": "19",
+          "actual_outcome": 0,
+          "probability": 0.11454801267712725,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.6401349150019845
+            }
+          ]
+        },
+        {
+          "borrower_id": "25",
+          "actual_outcome": 0,
+          "probability": 0.26193689298159534,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.2578464776690965
+            }
+          ]
+        },
+        {
+          "borrower_id": "27",
+          "actual_outcome": 1,
+          "probability": 0.2841853121852758,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 60000.0,
+              "contribution": 0.3576221879658833
+            }
+          ]
+        },
+        {
+          "borrower_id": "41",
+          "actual_outcome": 0,
+          "probability": 0.11454801267712725,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.6401349150019845
+            }
+          ]
+        },
+        {
+          "borrower_id": "43",
+          "actual_outcome": 0,
+          "probability": 0.32368023583699856,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 10000.0,
+              "contribution": 0.523915038460528
+            }
+          ]
+        },
+        {
+          "borrower_id": "61",
+          "actual_outcome": 1,
+          "probability": 0.0712012380683185,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 500000.0,
+              "contribution": -1.1057548963869894
+            }
+          ]
+        },
+        {
+          "borrower_id": "72",
+          "actual_outcome": 1,
+          "probability": 0.13060770361393406,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 320000.0,
+              "contribution": -0.5071006346062688
+            }
+          ]
+        },
+        {
+          "borrower_id": "76",
+          "actual_outcome": 0,
+          "probability": 0.31555250151817793,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 20000.0,
+              "contribution": 0.49065646836159904
+            }
+          ]
+        },
+        {
+          "borrower_id": "77",
+          "actual_outcome": 0,
+          "probability": 0.29184961955498545,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 50000.0,
+              "contribution": 0.3908807580648122
+            }
+          ]
+        }
+      ],
+      "seconds": 0.52
+    },
+    {
+      "id": "static-XGBoost",
+      "model": "XGBoost",
+      "feature_set": "static",
+      "features": [
+        "LIMIT_BAL"
+      ],
+      "chosen_candidate": 0,
+      "validation_auc": 0.6223759788425379,
+      "metrics": {
+        "roc_auc": 0.6092437903065455,
+        "pr_auc": 0.2965098477742615,
+        "brier": 0.16780748963356018
+      },
+      "confidence_intervals": {
+        "roc_auc": [
+          0.5947786708052109,
+          0.626420884404421
+        ],
+        "pr_auc": [
+          0.2773487803221981,
+          0.31392102081646617
+        ],
+        "brier": [
+          0.16154784820973872,
+          0.1732397112995386
+        ]
+      },
+      "calibration": [
+        {
+          "predicted": 0.11455903176573061,
+          "observed": 0.14166666666666666
+        },
+        {
+          "predicted": 0.15395481390153576,
+          "observed": 0.17724550898203592
+        },
+        {
+          "predicted": 0.16943806602187406,
+          "observed": 0.15522875816993464
+        },
+        {
+          "predicted": 0.19178688277181544,
+          "observed": 0.16832917705735662
+        },
+        {
+          "predicted": 0.22064431324518846,
+          "observed": 0.24861878453038674
+        },
+        {
+          "predicted": 0.27026734219721854,
+          "observed": 0.2583170254403131
+        },
+        {
+          "predicted": 0.325910203652427,
+          "observed": 0.3028391167192429
+        },
+        {
+          "predicted": 0.37101799861410467,
+          "observed": 0.3653483992467043
+        }
+      ],
+      "policy_points": [
+        {
+          "target_approval": 0.3,
+          "validation_threshold": 0.16643810272216797,
+          "test_approval": 0.3015,
+          "test_adverse_rate": 0.15920398009950248,
+          "adverse_rate_ci": [
+            0.14306850136694332,
+            0.17678382329286152
+          ],
+          "approved_count": 1809,
+          "matched_volume_adverse_rate": 0.15888888888888889,
+          "matched_volume_count": 1800
+        },
+        {
+          "target_approval": 0.5,
+          "validation_threshold": 0.20970840752124786,
+          "test_approval": 0.5148333333333334,
+          "test_adverse_rate": 0.1608934930398187,
+          "adverse_rate_ci": [
+            0.14835828677988294,
+            0.17427110361631454
+          ],
+          "approved_count": 3089,
+          "matched_volume_adverse_rate": 0.15933333333333333,
+          "matched_volume_count": 3000
+        },
+        {
+          "target_approval": 0.7,
+          "validation_threshold": 0.27207934856414795,
+          "test_approval": 0.6906666666666667,
+          "test_adverse_rate": 0.18194980694980695,
+          "adverse_rate_ci": [
+            0.1704995269665821,
+            0.1939892230377575
+          ],
+          "approved_count": 4144,
+          "matched_volume_adverse_rate": 0.1823809523809524,
+          "matched_volume_count": 4200
+        }
+      ],
+      "samples": [
+        {
+          "borrower_id": "3",
+          "actual_outcome": 0,
+          "probability": 0.27207934856414795,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.25975748896598816
+            }
+          ]
+        },
+        {
+          "borrower_id": "12",
+          "actual_outcome": 0,
+          "probability": 0.15237338840961456,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 260000.0,
+              "contribution": -0.4069717526435852
+            }
+          ]
+        },
+        {
+          "borrower_id": "15",
+          "actual_outcome": 0,
+          "probability": 0.16286437213420868,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 250000.0,
+              "contribution": -0.3349825143814087
+            }
+          ]
+        },
+        {
+          "borrower_id": "19",
+          "actual_outcome": 0,
+          "probability": 0.1466042399406433,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.44830530881881714
+            }
+          ]
+        },
+        {
+          "borrower_id": "25",
+          "actual_outcome": 0,
+          "probability": 0.27207934856414795,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.25975748896598816
+            }
+          ]
+        },
+        {
+          "borrower_id": "27",
+          "actual_outcome": 1,
+          "probability": 0.2883027195930481,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 60000.0,
+              "contribution": 0.3330400288105011
+            }
+          ]
+        },
+        {
+          "borrower_id": "41",
+          "actual_outcome": 0,
+          "probability": 0.1466042399406433,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.44830530881881714
+            }
+          ]
+        },
+        {
+          "borrower_id": "43",
+          "actual_outcome": 0,
+          "probability": 0.4054899513721466,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 10000.0,
+              "contribution": 0.8075789213180542
+            }
+          ]
+        },
+        {
+          "borrower_id": "61",
+          "actual_outcome": 1,
+          "probability": 0.09826298803091049,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 500000.0,
+              "contribution": -0.8629014492034912
+            }
+          ]
+        },
+        {
+          "borrower_id": "72",
+          "actual_outcome": 1,
+          "probability": 0.1336735039949417,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 320000.0,
+              "contribution": -0.5461047887802124
+            }
+          ]
+        },
+        {
+          "borrower_id": "76",
+          "actual_outcome": 0,
+          "probability": 0.35778161883354187,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 20000.0,
+              "contribution": 0.6232613921165466
+            }
+          ]
+        },
+        {
+          "borrower_id": "77",
+          "actual_outcome": 0,
+          "probability": 0.2754601836204529,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 50000.0,
+              "contribution": 0.27524617314338684
+            }
+          ]
+        }
+      ],
+      "seconds": 0.77
+    },
+    {
+      "id": "static-CatBoost",
+      "model": "CatBoost",
+      "feature_set": "static",
+      "features": [
+        "LIMIT_BAL"
+      ],
+      "chosen_candidate": 1,
+      "validation_auc": 0.6257657699539245,
+      "metrics": {
+        "roc_auc": 0.6087541168291737,
+        "pr_auc": 0.2971213961162999,
+        "brier": 0.1676292507400753
+      },
+      "confidence_intervals": {
+        "roc_auc": [
+          0.5940862525530421,
+          0.6254359514076587
+        ],
+        "pr_auc": [
+          0.2770816474610572,
+          0.3157618332283227
+        ],
+        "brier": [
+          0.1614338228368799,
+          0.17320319395015973
+        ]
+      },
+      "calibration": [
+        {
+          "predicted": 0.11960007578760151,
+          "observed": 0.15931108719052745
+        },
+        {
+          "predicted": 0.14804558169953305,
+          "observed": 0.1531986531986532
+        },
+        {
+          "predicted": 0.1673677852507939,
+          "observed": 0.16719914802981894
+        },
+        {
+          "predicted": 0.1915158071920828,
+          "observed": 0.1669266770670827
+        },
+        {
+          "predicted": 0.2281339538209431,
+          "observed": 0.24507042253521127
+        },
+        {
+          "predicted": 0.2733436966503418,
+          "observed": 0.2583170254403131
+        },
+        {
+          "predicted": 0.32222502062648073,
+          "observed": 0.3028391167192429
+        },
+        {
+          "predicted": 0.37118800884124376,
+          "observed": 0.3653483992467043
+        }
+      ],
+      "policy_points": [
+        {
+          "target_approval": 0.3,
+          "validation_threshold": 0.16691329131493574,
+          "test_approval": 0.33416666666666667,
+          "test_adverse_rate": 0.1600997506234414,
+          "adverse_rate_ci": [
+            0.14470072341291534,
+            0.17679879153141875
+          ],
+          "approved_count": 2005,
+          "matched_volume_adverse_rate": 0.15888888888888889,
+          "matched_volume_count": 1800
+        },
+        {
+          "target_approval": 0.5,
+          "validation_threshold": 0.2051314458214626,
+          "test_approval": 0.5171666666666667,
+          "test_adverse_rate": 0.16210119239445697,
+          "adverse_rate_ci": [
+            0.1495528546052096,
+            0.175485151838376
+          ],
+          "approved_count": 3103,
+          "matched_volume_adverse_rate": 0.15866666666666668,
+          "matched_volume_count": 3000
+        },
+        {
+          "target_approval": 0.7,
+          "validation_threshold": 0.2590474009491319,
+          "test_approval": 0.6906666666666667,
+          "test_adverse_rate": 0.18194980694980695,
+          "adverse_rate_ci": [
+            0.1704995269665821,
+            0.1939892230377575
+          ],
+          "approved_count": 4144,
+          "matched_volume_adverse_rate": 0.1823809523809524,
+          "matched_volume_count": 4200
+        }
+      ],
+      "samples": [
+        {
+          "borrower_id": "3",
+          "actual_outcome": 0,
+          "probability": 0.2590474009491319,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.2441243322847154
+            }
+          ]
+        },
+        {
+          "borrower_id": "12",
+          "actual_outcome": 0,
+          "probability": 0.14891935815438365,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 260000.0,
+              "contribution": -0.3716903716325657
+            }
+          ]
+        },
+        {
+          "borrower_id": "15",
+          "actual_outcome": 0,
+          "probability": 0.15395783588927697,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 250000.0,
+              "contribution": -0.33680470862485123
+            }
+          ]
+        },
+        {
+          "borrower_id": "19",
+          "actual_outcome": 0,
+          "probability": 0.1352977121814703,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.4711615447893722
+            }
+          ]
+        },
+        {
+          "borrower_id": "25",
+          "actual_outcome": 0,
+          "probability": 0.2590474009491319,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.2441243322847154
+            }
+          ]
+        },
+        {
+          "borrower_id": "27",
+          "actual_outcome": 1,
+          "probability": 0.28645015032562443,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 60000.0,
+              "contribution": 0.3671116046172941
+            }
+          ]
+        },
+        {
+          "borrower_id": "41",
+          "actual_outcome": 0,
+          "probability": 0.1352977121814703,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.4711615447893722
+            }
+          ]
+        },
+        {
+          "borrower_id": "43",
+          "actual_outcome": 0,
+          "probability": 0.4044204336651209,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 10000.0,
+              "contribution": 0.8347337775044421
+            }
+          ]
+        },
+        {
+          "borrower_id": "61",
+          "actual_outcome": 1,
+          "probability": 0.09531931972329259,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 500000.0,
+              "contribution": -0.8229778468417428
+            }
+          ]
+        },
+        {
+          "borrower_id": "72",
+          "actual_outcome": 1,
+          "probability": 0.1283240318417122,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 320000.0,
+              "contribution": -0.5253888525077574
+            }
+          ]
+        },
+        {
+          "borrower_id": "76",
+          "actual_outcome": 0,
+          "probability": 0.36202799095834043,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 20000.0,
+              "contribution": 0.67504273025914
+            }
+          ]
+        },
+        {
+          "borrower_id": "77",
+          "actual_outcome": 0,
+          "probability": 0.28427462424005767,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 50000.0,
+              "contribution": 0.35762050370771364
+            }
+          ]
+        }
+      ],
+      "seconds": 1.16
+    },
+    {
+      "id": "behavioural-Logistic regression",
+      "model": "Logistic regression",
+      "feature_set": "behavioural",
+      "features": [
+        "LIMIT_BAL",
+        "PAY_0",
+        "PAY_2",
+        "PAY_3",
+        "PAY_4",
+        "PAY_5",
+        "PAY_6",
+        "BILL_AMT1",
+        "BILL_AMT2",
+        "BILL_AMT3",
+        "BILL_AMT4",
+        "BILL_AMT5",
+        "BILL_AMT6",
+        "PAY_AMT1",
+        "PAY_AMT2",
+        "PAY_AMT3",
+        "PAY_AMT4",
+        "PAY_AMT5",
+        "PAY_AMT6"
+      ],
+      "chosen_candidate": 1,
+      "validation_auc": 0.7353509370028307,
+      "metrics": {
+        "roc_auc": 0.7140025489145343,
+        "pr_auc": 0.49970232307268114,
+        "brier": 0.14647795891822638
+      },
+      "confidence_intervals": {
+        "roc_auc": [
+          0.6968944650440907,
+          0.7286839879598603
+        ],
+        "pr_auc": [
+          0.47061907066873865,
+          0.5247278305252879
+        ],
+        "brier": [
+          0.1409830332227216,
+          0.15164390246209597
+        ]
+      },
+      "calibration": [
+        {
+          "predicted": 0.04462685536556449,
+          "observed": 0.12266666666666666
+        },
+        {
+          "predicted": 0.0970140918315975,
+          "observed": 0.13333333333333333
+        },
+        {
+          "predicted": 0.13820006466956877,
+          "observed": 0.156
+        },
+        {
+          "predicted": 0.18506019661580633,
+          "observed": 0.104
+        },
+        {
+          "predicted": 0.21526372072165081,
+          "observed": 0.108
+        },
+        {
+          "predicted": 0.2376594591384194,
+          "observed": 0.20133333333333334
+        },
+        {
+          "predicted": 0.3022620106589689,
+          "observed": 0.29733333333333334
+        },
+        {
+          "predicted": 0.5681652011156787,
+          "observed": 0.6466666666666666
+        }
+      ],
+      "policy_points": [
+        {
+          "target_approval": 0.3,
+          "validation_threshold": 0.13165694102416248,
+          "test_approval": 0.29983333333333334,
+          "test_adverse_rate": 0.13952195664257921,
+          "adverse_rate_ci": [
+            0.12427723160735704,
+            0.15630293694433378
+          ],
+          "approved_count": 1799,
+          "matched_volume_adverse_rate": 0.13944444444444445,
+          "matched_volume_count": 1800
+        },
+        {
+          "target_approval": 0.5,
+          "validation_threshold": 0.20169925338947833,
+          "test_approval": 0.497,
+          "test_adverse_rate": 0.12944332662642521,
+          "adverse_rate_ci": [
+            0.11786969378406299,
+            0.14197047992106593
+          ],
+          "approved_count": 2982,
+          "matched_volume_adverse_rate": 0.129,
+          "matched_volume_count": 3000
+        },
+        {
+          "target_approval": 0.7,
+          "validation_threshold": 0.2392580174139118,
+          "test_approval": 0.7,
+          "test_adverse_rate": 0.1330952380952381,
+          "adverse_rate_ci": [
+            0.12315672355377665,
+            0.14370433039268987
+          ],
+          "approved_count": 4200,
+          "matched_volume_adverse_rate": 0.1330952380952381,
+          "matched_volume_count": 4200
+        }
+      ],
+      "samples": [
+        {
+          "borrower_id": "3",
+          "actual_outcome": 0,
+          "probability": 0.22063023561960277,
+          "contributions": [
+            {
+              "feature": "BILL_AMT3",
+              "value": 13559.0,
+              "contribution": -0.11501726212423076
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 29239.0,
+              "contribution": 0.10925397375664056
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 14331.0,
+              "contribution": 0.05711509443771332
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 14948.0,
+              "contribution": -0.043617305328004154
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 1518.0,
+              "contribution": 0.04351701301052711
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 1500.0,
+              "contribution": 0.042832962612695265
+            }
+          ]
+        },
+        {
+          "borrower_id": "12",
+          "actual_outcome": 0,
+          "probability": 0.07271857667202589,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": -1.0,
+              "contribution": -0.5336334870690501
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 12261.0,
+              "contribution": 0.19441005302304462
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 21818.0,
+              "contribution": -0.1655068668945984
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 9966.0,
+              "contribution": -0.12736506662773972
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 22301.0,
+              "contribution": -0.0946413739417532
+            },
+            {
+              "feature": "PAY_2",
+              "value": -1.0,
+              "contribution": -0.09411962373386025
+            }
+          ]
+        },
+        {
+          "borrower_id": "15",
+          "actual_outcome": 0,
+          "probability": 0.19767805128763247,
+          "contributions": [
+            {
+              "feature": "BILL_AMT1",
+              "value": 70887.0,
+              "contribution": -0.09963873382300346
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 63561.0,
+              "contribution": 0.05682101251658585
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 250000.0,
+              "contribution": -0.04315857321219198
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 59696.0,
+              "contribution": -0.03231933865857213
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 56875.0,
+              "contribution": 0.028483629902091533
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 3000.0,
+              "contribution": 0.028337901094567117
+            }
+          ]
+        },
+        {
+          "borrower_id": "19",
+          "actual_outcome": 0,
+          "probability": 0.23560656585748524,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 1.0,
+              "contribution": 0.5588177592170749
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 0.0,
+              "contribution": 0.2559072074514449
+            },
+            {
+              "feature": "PAY_2",
+              "value": -2.0,
+              "contribution": -0.2023980916822851
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 0.0,
+              "contribution": -0.16161450155175033
+            },
+            {
+              "feature": "PAY_3",
+              "value": -2.0,
+              "contribution": -0.11510881903720616
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.10072275598098465
+            }
+          ]
+        },
+        {
+          "borrower_id": "25",
+          "actual_outcome": 0,
+          "probability": 0.2225261369939398,
+          "contributions": [
+            {
+              "feature": "BILL_AMT1",
+              "value": 4744.0,
+              "contribution": 0.23211285946936097
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 0.0,
+              "contribution": -0.16161450155175033
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 5398.0,
+              "contribution": 0.0747259792795323
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 6360.0,
+              "contribution": -0.05838589911616123
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 0.0,
+              "contribution": 0.05732802413082342
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.04057114717877919
+            }
+          ]
+        },
+        {
+          "borrower_id": "27",
+          "actual_outcome": 1,
+          "probability": 0.294537884419225,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 1.0,
+              "contribution": 0.5588177592170749
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": -109.0,
+              "contribution": 0.2564539156997685
+            },
+            {
+              "feature": "PAY_2",
+              "value": -2.0,
+              "contribution": -0.2023980916822851
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 259.0,
+              "contribution": -0.16072441489257724
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": -57.0,
+              "contribution": 0.0854801913932816
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 127.0,
+              "contribution": -0.06910465145449181
+            }
+          ]
+        },
+        {
+          "borrower_id": "41",
+          "actual_outcome": 0,
+          "probability": 0.019598044142040284,
+          "contributions": [
+            {
+              "feature": "BILL_AMT4",
+              "value": 628699.0,
+              "contribution": -1.154075334141559
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 188840.0,
+              "contribution": -0.996287498946979
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 218668.0,
+              "contribution": -0.8408597580937337
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 206895.0,
+              "contribution": 0.5494066542382532
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 195969.0,
+              "contribution": 0.26768050744865884
+            },
+            {
+              "feature": "BILL_AMT2",
+              "value": 221296.0,
+              "contribution": 0.1657521822336757
+            }
+          ]
+        },
+        {
+          "borrower_id": "43",
+          "actual_outcome": 0,
+          "probability": 0.25003862039034147,
+          "contributions": [
+            {
+              "feature": "BILL_AMT1",
+              "value": 1877.0,
+              "contribution": 0.2464927911018725
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 6003.0,
+              "contribution": -0.14098442350149587
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 10000.0,
+              "contribution": 0.08243600737426476
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 3576.0,
+              "contribution": 0.0783179452687626
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 3670.0,
+              "contribution": -0.0630118326618229
+            },
+            {
+              "feature": "BILL_AMT2",
+              "value": 3184.0,
+              "contribution": -0.04417471184516637
+            }
+          ]
+        },
+        {
+          "borrower_id": "61",
+          "actual_outcome": 1,
+          "probability": 0.19279563200443608,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 500000.0,
+              "contribution": -0.17398626132308442
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 22848.0,
+              "contribution": 0.14130913352761407
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 18878.0,
+              "contribution": -0.09673783764491986
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 14937.0,
+              "contribution": 0.055920401029659776
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 13827.0,
+              "contribution": -0.04554506425167952
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 1300.0,
+              "contribution": 0.04476563748177902
+            }
+          ]
+        },
+        {
+          "borrower_id": "72",
+          "actual_outcome": 1,
+          "probability": 0.5966763597222486,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 2.0,
+              "contribution": 1.105043382360137
+            },
+            {
+              "feature": "PAY_2",
+              "value": 2.0,
+              "contribution": 0.23071578011141433
+            },
+            {
+              "feature": "PAY_3",
+              "value": 2.0,
+              "contribution": 0.13551877654912492
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 320000.0,
+              "contribution": -0.07979032588324185
+            },
+            {
+              "feature": "PAY_4",
+              "value": 2.0,
+              "contribution": 0.06542562515760511
+            },
+            {
+              "feature": "PAY_5",
+              "value": 2.0,
+              "contribution": 0.05353351129344545
+            }
+          ]
+        },
+        {
+          "borrower_id": "76",
+          "actual_outcome": 0,
+          "probability": 0.27596853018387374,
+          "contributions": [
+            {
+              "feature": "BILL_AMT1",
+              "value": 14619.0,
+              "contribution": 0.18258309844004422
+            },
+            {
+              "feature": "PAY_3",
+              "value": 2.0,
+              "contribution": 0.13551877654912492
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 16642.0,
+              "contribution": -0.10442213791484638
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 20000.0,
+              "contribution": 0.07720289984982907
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 0.0,
+              "contribution": 0.05732802413082342
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 16976.0,
+              "contribution": 0.05190063228540041
+            }
+          ]
+        },
+        {
+          "borrower_id": "77",
+          "actual_outcome": 0,
+          "probability": 0.1410214836253887,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": -1.0,
+              "contribution": -0.5336334870690501
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 9636.0,
+              "contribution": 0.06637101118822716
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 50000.0,
+              "contribution": 0.061503577276521976
+            },
+            {
+              "feature": "BILL_AMT5",
+              "value": 9590.0,
+              "contribution": -0.05283133950557118
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 42838.0,
+              "contribution": 0.04104585018826803
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 1759.0,
+              "contribution": 0.04103549798308202
+            }
+          ]
+        }
+      ],
+      "seconds": 0.65
+    },
+    {
+      "id": "behavioural-XGBoost",
+      "model": "XGBoost",
+      "feature_set": "behavioural",
+      "features": [
+        "LIMIT_BAL",
+        "PAY_0",
+        "PAY_2",
+        "PAY_3",
+        "PAY_4",
+        "PAY_5",
+        "PAY_6",
+        "BILL_AMT1",
+        "BILL_AMT2",
+        "BILL_AMT3",
+        "BILL_AMT4",
+        "BILL_AMT5",
+        "BILL_AMT6",
+        "PAY_AMT1",
+        "PAY_AMT2",
+        "PAY_AMT3",
+        "PAY_AMT4",
+        "PAY_AMT5",
+        "PAY_AMT6"
+      ],
+      "chosen_candidate": 1,
+      "validation_auc": 0.7906397213785408,
+      "metrics": {
+        "roc_auc": 0.7842021966850565,
+        "pr_auc": 0.5526616257050335,
+        "brier": 0.13429506123065948
+      },
+      "confidence_intervals": {
+        "roc_auc": [
+          0.7689695480744925,
+          0.7970535477683192
+        ],
+        "pr_auc": [
+          0.5214076878224778,
+          0.5797331629721842
+        ],
+        "brier": [
+          0.12920915223658086,
+          0.13872177228331567
+        ]
+      },
+      "calibration": [
+        {
+          "predicted": 0.04758284712955356,
+          "observed": 0.04533333333333334
+        },
+        {
+          "predicted": 0.08165250177184741,
+          "observed": 0.07066666666666667
+        },
+        {
+          "predicted": 0.10773847768704096,
+          "observed": 0.1
+        },
+        {
+          "predicted": 0.13732160311937333,
+          "observed": 0.15466666666666667
+        },
+        {
+          "predicted": 0.17234033662080764,
+          "observed": 0.15733333333333333
+        },
+        {
+          "predicted": 0.22717925069729486,
+          "observed": 0.20933333333333334
+        },
+        {
+          "predicted": 0.3565929130315781,
+          "observed": 0.37866666666666665
+        },
+        {
+          "predicted": 0.6631751435597738,
+          "observed": 0.6533333333333333
+        }
+      ],
+      "policy_points": [
+        {
+          "target_approval": 0.3,
+          "validation_threshold": 0.10608650743961334,
+          "test_approval": 0.30633333333333335,
+          "test_adverse_rate": 0.06365614798694233,
+          "adverse_rate_ci": [
+            0.05337934727024324,
+            0.07575314707671907
+          ],
+          "approved_count": 1838,
+          "matched_volume_adverse_rate": 0.06388888888888888,
+          "matched_volume_count": 1800
+        },
+        {
+          "target_approval": 0.5,
+          "validation_threshold": 0.1533472090959549,
+          "test_approval": 0.4945,
+          "test_adverse_rate": 0.09201213346814964,
+          "adverse_rate_ci": [
+            0.08213241409629957,
+            0.10294699235876015
+          ],
+          "approved_count": 2967,
+          "matched_volume_adverse_rate": 0.09266666666666666,
+          "matched_volume_count": 3000
+        },
+        {
+          "target_approval": 0.7,
+          "validation_threshold": 0.23505578935146332,
+          "test_approval": 0.7048333333333333,
+          "test_adverse_rate": 0.11444786001418775,
+          "adverse_rate_ci": [
+            0.10520067973553805,
+            0.12439487139493656
+          ],
+          "approved_count": 4229,
+          "matched_volume_adverse_rate": 0.11404761904761905,
+          "matched_volume_count": 4200
+        }
+      ],
+      "samples": [
+        {
+          "borrower_id": "3",
+          "actual_outcome": 0,
+          "probability": 0.11971604824066162,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.407284140586853
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 29239.0,
+              "contribution": -0.23601609468460083
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 1500.0,
+              "contribution": 0.08967484533786774
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 1000.0,
+              "contribution": -0.0879586860537529
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.08766282349824905
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.08509133011102676
+            }
+          ]
+        },
+        {
+          "borrower_id": "12",
+          "actual_outcome": 0,
+          "probability": 0.09858144819736481,
+          "contributions": [
+            {
+              "feature": "PAY_6",
+              "value": 2.0,
+              "contribution": 0.39241865277290344
+            },
+            {
+              "feature": "PAY_0",
+              "value": -1.0,
+              "contribution": -0.38679859042167664
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 260000.0,
+              "contribution": -0.2473345845937729
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 8583.0,
+              "contribution": -0.15271346271038055
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 21818.0,
+              "contribution": -0.14945441484451294
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 9966.0,
+              "contribution": -0.10331397503614426
+            }
+          ]
+        },
+        {
+          "borrower_id": "15",
+          "actual_outcome": 0,
+          "probability": 0.053581755608320236,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.49404117465019226
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 250000.0,
+              "contribution": -0.4154130220413208
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 70887.0,
+              "contribution": -0.266122967004776
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 3000.0,
+              "contribution": -0.13103416562080383
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 3000.0,
+              "contribution": -0.1284232884645462
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 63561.0,
+              "contribution": 0.10557594150304794
+            }
+          ]
+        },
+        {
+          "borrower_id": "19",
+          "actual_outcome": 0,
+          "probability": 0.41252708435058594,
+          "contributions": [
+            {
+              "feature": "PAY_AMT3",
+              "value": 0.0,
+              "contribution": 0.2807067334651947
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 0.0,
+              "contribution": 0.23744376003742218
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 0.0,
+              "contribution": 0.16506561636924744
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 0.0,
+              "contribution": 0.16165955364704132
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 0.0,
+              "contribution": -0.1042775884270668
+            },
+            {
+              "feature": "PAY_0",
+              "value": 1.0,
+              "contribution": 0.09400451183319092
+            }
+          ]
+        },
+        {
+          "borrower_id": "25",
+          "actual_outcome": 0,
+          "probability": 0.07694052904844284,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.4146326780319214
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 0.0,
+              "contribution": -0.284630686044693
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 5757.0,
+              "contribution": -0.17766888439655304
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 5398.0,
+              "contribution": -0.14161492884159088
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 0.0,
+              "contribution": 0.08813339471817017
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.08132701367139816
+            }
+          ]
+        },
+        {
+          "borrower_id": "27",
+          "actual_outcome": 1,
+          "probability": 0.3194451630115509,
+          "contributions": [
+            {
+              "feature": "BILL_AMT6",
+              "value": -189.0,
+              "contribution": 0.30903422832489014
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 0.0,
+              "contribution": 0.23795531690120697
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 60000.0,
+              "contribution": 0.1565917730331421
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 500.0,
+              "contribution": -0.15042519569396973
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 259.0,
+              "contribution": -0.13874508440494537
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": -109.0,
+              "contribution": 0.12750554084777832
+            }
+          ]
+        },
+        {
+          "borrower_id": "41",
+          "actual_outcome": 0,
+          "probability": 0.06534366309642792,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.4300633668899536
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.4184727370738983
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 10000.0,
+              "contribution": -0.3035150468349457
+            },
+            {
+              "feature": "PAY_AMT5",
+              "value": 28000.0,
+              "contribution": -0.22350984811782837
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 7000.0,
+              "contribution": -0.14215680956840515
+            },
+            {
+              "feature": "BILL_AMT2",
+              "value": 221296.0,
+              "contribution": 0.13028296828269958
+            }
+          ]
+        },
+        {
+          "borrower_id": "43",
+          "actual_outcome": 0,
+          "probability": 0.22383953630924225,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.3102305233478546
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 10000.0,
+              "contribution": 0.28448718786239624
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 1877.0,
+              "contribution": 0.14136111736297607
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 1000.0,
+              "contribution": -0.0921858623623848
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 300.0,
+              "contribution": 0.08879515528678894
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 1500.0,
+              "contribution": 0.07020311057567596
+            }
+          ]
+        },
+        {
+          "borrower_id": "61",
+          "actual_outcome": 1,
+          "probability": 0.05298309773206711,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.48563075065612793
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 500000.0,
+              "contribution": -0.43750280141830444
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 22848.0,
+              "contribution": -0.30090710520744324
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 1300.0,
+              "contribution": 0.09696369618177414
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 1000.0,
+              "contribution": -0.095348060131073
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.09034742414951324
+            }
+          ]
+        },
+        {
+          "borrower_id": "72",
+          "actual_outcome": 1,
+          "probability": 0.752263605594635,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 2.0,
+              "contribution": 1.6413178443908691
+            },
+            {
+              "feature": "PAY_2",
+              "value": 2.0,
+              "contribution": 0.3446561396121979
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 320000.0,
+              "contribution": -0.2685892879962921
+            },
+            {
+              "feature": "PAY_6",
+              "value": 2.0,
+              "contribution": 0.23442581295967102
+            },
+            {
+              "feature": "PAY_3",
+              "value": 2.0,
+              "contribution": 0.16991457343101501
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 0.0,
+              "contribution": 0.1549951732158661
+            }
+          ]
+        },
+        {
+          "borrower_id": "76",
+          "actual_outcome": 0,
+          "probability": 0.29188939929008484,
+          "contributions": [
+            {
+              "feature": "PAY_3",
+              "value": 2.0,
+              "contribution": 0.3933616280555725
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 20000.0,
+              "contribution": 0.3292180895805359
+            },
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.3215947449207306
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 0.0,
+              "contribution": 0.1334037482738495
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.07956958562135696
+            },
+            {
+              "feature": "PAY_AMT6",
+              "value": 0.0,
+              "contribution": 0.04589356109499931
+            }
+          ]
+        },
+        {
+          "borrower_id": "77",
+          "actual_outcome": 0,
+          "probability": 0.13471494615077972,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": -1.0,
+              "contribution": -0.3738951086997986
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 50000.0,
+              "contribution": 0.2993601858615875
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 42838.0,
+              "contribution": -0.223566472530365
+            },
+            {
+              "feature": "PAY_AMT6",
+              "value": 1000.0,
+              "contribution": -0.12685343623161316
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 1779.0,
+              "contribution": -0.0830925926566124
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 36087.0,
+              "contribution": 0.08033935725688934
+            }
+          ]
+        }
+      ],
+      "seconds": 0.96
+    },
+    {
+      "id": "behavioural-CatBoost",
+      "model": "CatBoost",
+      "feature_set": "behavioural",
+      "features": [
+        "LIMIT_BAL",
+        "PAY_0",
+        "PAY_2",
+        "PAY_3",
+        "PAY_4",
+        "PAY_5",
+        "PAY_6",
+        "BILL_AMT1",
+        "BILL_AMT2",
+        "BILL_AMT3",
+        "BILL_AMT4",
+        "BILL_AMT5",
+        "BILL_AMT6",
+        "PAY_AMT1",
+        "PAY_AMT2",
+        "PAY_AMT3",
+        "PAY_AMT4",
+        "PAY_AMT5",
+        "PAY_AMT6"
+      ],
+      "chosen_candidate": 1,
+      "validation_auc": 0.7932269390896507,
+      "metrics": {
+        "roc_auc": 0.7859506043391535,
+        "pr_auc": 0.5550113094886323,
+        "brier": 0.13389069987192356
+      },
+      "confidence_intervals": {
+        "roc_auc": [
+          0.771738748187905,
+          0.7994590730812475
+        ],
+        "pr_auc": [
+          0.5264626331427469,
+          0.5811677220146532
+        ],
+        "brier": [
+          0.12856869228462459,
+          0.13815138363888343
+        ]
+      },
+      "calibration": [
+        {
+          "predicted": 0.0553437861324748,
+          "observed": 0.056
+        },
+        {
+          "predicted": 0.08676915315284532,
+          "observed": 0.068
+        },
+        {
+          "predicted": 0.10752609980971348,
+          "observed": 0.084
+        },
+        {
+          "predicted": 0.1357187288412785,
+          "observed": 0.13466666666666666
+        },
+        {
+          "predicted": 0.164685785421615,
+          "observed": 0.18933333333333333
+        },
+        {
+          "predicted": 0.22107537561919638,
+          "observed": 0.20133333333333334
+        },
+        {
+          "predicted": 0.3481997316957129,
+          "observed": 0.37466666666666665
+        },
+        {
+          "predicted": 0.6696260928579214,
+          "observed": 0.6613333333333333
+        }
+      ],
+      "policy_points": [
+        {
+          "target_approval": 0.3,
+          "validation_threshold": 0.10559882661904489,
+          "test_approval": 0.30533333333333335,
+          "test_adverse_rate": 0.06550218340611354,
+          "adverse_rate_ci": [
+            0.055057301493423645,
+            0.07776548670355371
+          ],
+          "approved_count": 1832,
+          "matched_volume_adverse_rate": 0.0661111111111111,
+          "matched_volume_count": 1800
+        },
+        {
+          "target_approval": 0.5,
+          "validation_threshold": 0.14754149835364389,
+          "test_approval": 0.48733333333333334,
+          "test_adverse_rate": 0.08549931600547196,
+          "adverse_rate_ci": [
+            0.07589984391234249,
+            0.09618651485788608
+          ],
+          "approved_count": 2924,
+          "matched_volume_adverse_rate": 0.08566666666666667,
+          "matched_volume_count": 3000
+        },
+        {
+          "target_approval": 0.7,
+          "validation_threshold": 0.23165973201283738,
+          "test_approval": 0.7085,
+          "test_adverse_rate": 0.11314984709480122,
+          "adverse_rate_ci": [
+            0.10397426368249545,
+            0.12302398696918564
+          ],
+          "approved_count": 4251,
+          "matched_volume_adverse_rate": 0.11190476190476191,
+          "matched_volume_count": 4200
+        }
+      ],
+      "samples": [
+        {
+          "borrower_id": "3",
+          "actual_outcome": 0,
+          "probability": 0.11928519369150432,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.254771468499583
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 29239.0,
+              "contribution": -0.09374199762087171
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.057430914538077346
+            },
+            {
+              "feature": "BILL_AMT2",
+              "value": 14027.0,
+              "contribution": -0.04634097543446194
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.04580931104055155
+            },
+            {
+              "feature": "PAY_4",
+              "value": 0.0,
+              "contribution": -0.03935263856847873
+            }
+          ]
+        },
+        {
+          "borrower_id": "12",
+          "actual_outcome": 0,
+          "probability": 0.06883682861173449,
+          "contributions": [
+            {
+              "feature": "PAY_6",
+              "value": 2.0,
+              "contribution": 0.3799100454642236
+            },
+            {
+              "feature": "PAY_0",
+              "value": -1.0,
+              "contribution": -0.22075402973050548
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 260000.0,
+              "contribution": -0.2158829929329363
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 21818.0,
+              "contribution": -0.1840039122077155
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 22301.0,
+              "contribution": -0.15820705380072742
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 8583.0,
+              "contribution": -0.12354657867459938
+            }
+          ]
+        },
+        {
+          "borrower_id": "15",
+          "actual_outcome": 0,
+          "probability": 0.06888450634419979,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 250000.0,
+              "contribution": -0.29085888005577615
+            },
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.27048936733828216
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 70887.0,
+              "contribution": -0.09318241112180052
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 3000.0,
+              "contribution": -0.07297979568569081
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.06610571381140201
+            },
+            {
+              "feature": "BILL_AMT2",
+              "value": 67060.0,
+              "contribution": -0.04455044769411405
+            }
+          ]
+        },
+        {
+          "borrower_id": "19",
+          "actual_outcome": 0,
+          "probability": 0.40270778029336896,
+          "contributions": [
+            {
+              "feature": "PAY_AMT3",
+              "value": 0.0,
+              "contribution": 0.22623206277562488
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 0.0,
+              "contribution": 0.20781868093467368
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 0.0,
+              "contribution": 0.19226291943838086
+            },
+            {
+              "feature": "PAY_0",
+              "value": 1.0,
+              "contribution": 0.16875392041641663
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 0.0,
+              "contribution": 0.1667107971637497
+            },
+            {
+              "feature": "PAY_AMT6",
+              "value": 0.0,
+              "contribution": 0.09041888598963178
+            }
+          ]
+        },
+        {
+          "borrower_id": "25",
+          "actual_outcome": 0,
+          "probability": 0.11305560583930689,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.21468828487335162
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 5398.0,
+              "contribution": -0.10630846538449924
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 5757.0,
+              "contribution": -0.10050164460027738
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 90000.0,
+              "contribution": 0.062111096578723345
+            },
+            {
+              "feature": "PAY_AMT6",
+              "value": 2000.0,
+              "contribution": -0.05067403476157158
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.04477253811654711
+            }
+          ]
+        },
+        {
+          "borrower_id": "27",
+          "actual_outcome": 1,
+          "probability": 0.2553489883186088,
+          "contributions": [
+            {
+              "feature": "PAY_AMT3",
+              "value": 0.0,
+              "contribution": 0.20751772035340696
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 0.0,
+              "contribution": 0.15187491693515054
+            },
+            {
+              "feature": "PAY_0",
+              "value": 1.0,
+              "contribution": 0.1299579306265906
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 60000.0,
+              "contribution": 0.1174225014758573
+            },
+            {
+              "feature": "PAY_2",
+              "value": -2.0,
+              "contribution": -0.09251023282306292
+            },
+            {
+              "feature": "PAY_3",
+              "value": -1.0,
+              "contribution": -0.0791404169350217
+            }
+          ]
+        },
+        {
+          "borrower_id": "41",
+          "actual_outcome": 0,
+          "probability": 0.08100074850284546,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 360000.0,
+              "contribution": -0.28629922883497627
+            },
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.27719667125273734
+            },
+            {
+              "feature": "PAY_AMT5",
+              "value": 28000.0,
+              "contribution": -0.20026375115402342
+            },
+            {
+              "feature": "BILL_AMT4",
+              "value": 628699.0,
+              "contribution": 0.12098374118817912
+            },
+            {
+              "feature": "PAY_AMT1",
+              "value": 10000.0,
+              "contribution": -0.10381178335244842
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 188840.0,
+              "contribution": -0.08472472059454837
+            }
+          ]
+        },
+        {
+          "borrower_id": "43",
+          "actual_outcome": 0,
+          "probability": 0.21239554900452892,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 10000.0,
+              "contribution": 0.35254460388724934
+            },
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.19780781318603582
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 1877.0,
+              "contribution": 0.0781431453436122
+            },
+            {
+              "feature": "PAY_AMT4",
+              "value": 300.0,
+              "contribution": 0.07095814378336211
+            },
+            {
+              "feature": "PAY_AMT6",
+              "value": 500.0,
+              "contribution": 0.059880992462551186
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.04271121017365866
+            }
+          ]
+        },
+        {
+          "borrower_id": "61",
+          "actual_outcome": 1,
+          "probability": 0.05717996152757412,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 500000.0,
+              "contribution": -0.5785953925640964
+            },
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.25308830019936723
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 22848.0,
+              "contribution": -0.14395292081618877
+            },
+            {
+              "feature": "BILL_AMT2",
+              "value": 23638.0,
+              "contribution": -0.07091089885623071
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.07045392521364109
+            },
+            {
+              "feature": "BILL_AMT3",
+              "value": 18878.0,
+              "contribution": -0.04764542176908144
+            }
+          ]
+        },
+        {
+          "borrower_id": "72",
+          "actual_outcome": 1,
+          "probability": 0.7698925446057349,
+          "contributions": [
+            {
+              "feature": "PAY_0",
+              "value": 2.0,
+              "contribution": 1.4558942287818586
+            },
+            {
+              "feature": "PAY_2",
+              "value": 2.0,
+              "contribution": 0.3093344588333807
+            },
+            {
+              "feature": "PAY_6",
+              "value": 2.0,
+              "contribution": 0.2564728864199373
+            },
+            {
+              "feature": "PAY_3",
+              "value": 2.0,
+              "contribution": 0.25047794181083105
+            },
+            {
+              "feature": "PAY_5",
+              "value": 2.0,
+              "contribution": 0.24777098777655235
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 320000.0,
+              "contribution": -0.21541929253145703
+            }
+          ]
+        },
+        {
+          "borrower_id": "76",
+          "actual_outcome": 0,
+          "probability": 0.27793013447286474,
+          "contributions": [
+            {
+              "feature": "PAY_3",
+              "value": 2.0,
+              "contribution": 0.4360529350632167
+            },
+            {
+              "feature": "LIMIT_BAL",
+              "value": 20000.0,
+              "contribution": 0.33347848524519025
+            },
+            {
+              "feature": "PAY_0",
+              "value": 0.0,
+              "contribution": -0.22811441726719506
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.07134353205681455
+            },
+            {
+              "feature": "PAY_AMT2",
+              "value": 0.0,
+              "contribution": 0.07084068935718328
+            },
+            {
+              "feature": "PAY_AMT6",
+              "value": 0.0,
+              "contribution": 0.049353638016637114
+            }
+          ]
+        },
+        {
+          "borrower_id": "77",
+          "actual_outcome": 0,
+          "probability": 0.16102963259215744,
+          "contributions": [
+            {
+              "feature": "LIMIT_BAL",
+              "value": 50000.0,
+              "contribution": 0.29229718379998093
+            },
+            {
+              "feature": "PAY_0",
+              "value": -1.0,
+              "contribution": -0.23746124399064994
+            },
+            {
+              "feature": "BILL_AMT1",
+              "value": 42838.0,
+              "contribution": -0.10639193116812908
+            },
+            {
+              "feature": "PAY_AMT3",
+              "value": 320.0,
+              "contribution": 0.0672834332115268
+            },
+            {
+              "feature": "PAY_2",
+              "value": 0.0,
+              "contribution": -0.05471055572892596
+            },
+            {
+              "feature": "PAY_6",
+              "value": 0.0,
+              "contribution": -0.03745379719410742
+            }
+          ]
+        }
+      ],
+      "seconds": 1.48
+    }
+  ]
+}
