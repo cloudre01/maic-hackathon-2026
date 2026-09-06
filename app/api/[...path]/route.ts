@@ -2,10 +2,10 @@ import type { NextRequest } from 'next/server';
 
 // The browser talks only to this origin; this handler forwards to the Python
 // service. A plain `rewrites()` entry cannot set headers on the outgoing
-// request, and the upstream sits behind a CDN that answers non-browser user
-// agents with a 403 challenge page. The browser Origin is passed through
-// unchanged, so the `local_privacy` guard in backend/main.py still applies —
-// name this deployment in ARUS_ALLOWED_ORIGINS there.
+// request, and the bearer token has to be attached here so that it stays on the
+// server. The browser Origin is passed through unchanged, so the
+// `local_privacy` guard in backend/main.py still applies — name this deployment
+// in ARUS_ALLOWED_ORIGINS there.
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -14,9 +14,6 @@ const UPSTREAM = process.env.ARUS_API_URL || 'http://127.0.0.1:8000';
 // Server-side only: this never reaches the browser, which is what lets the
 // upstream stay closed to everyone who has not been given the token.
 const API_TOKEN = process.env.ARUS_API_TOKEN;
-const BROWSER_UA =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
-
 const FORWARD_REQUEST_HEADERS = ['content-type', 'accept', 'origin'];
 const FORWARD_RESPONSE_HEADERS = [
   'content-type',
@@ -30,7 +27,7 @@ async function proxy(request: NextRequest, path: string[]) {
   );
   target.search = request.nextUrl.search;
 
-  const headers = new Headers({ 'user-agent': BROWSER_UA });
+  const headers = new Headers();
   if (API_TOKEN) headers.set('authorization', `Bearer ${API_TOKEN}`);
   for (const name of FORWARD_REQUEST_HEADERS) {
     const value = request.headers.get(name);
@@ -53,14 +50,12 @@ async function proxy(request: NextRequest, path: string[]) {
     );
   }
 
-  // A challenge page from the CDN is an HTML or text 403 that the client would
-  // otherwise report as a dead backend.
+  // An error body that is not JSON did not come from the service itself, and
+  // the client only knows how to read a JSON detail.
   const contentType = upstream.headers.get('content-type') || '';
   if (!upstream.ok && !contentType.includes('json')) {
     return Response.json(
-      {
-        detail: `The assessment service was blocked upstream (${upstream.status}).`,
-      },
+      { detail: `The assessment service is unavailable (${upstream.status}).` },
       { status: 502 },
     );
   }
