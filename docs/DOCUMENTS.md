@@ -2,6 +2,8 @@
 
 Open http://127.0.0.1:3000 and choose **Document intake**.
 
+For the complete alternative-data pitch, choose **Try Aina’s alternative-data story**. See [the matching, obligation and comparison walkthrough](ALTERNATIVE_EVIDENCE_DEMO.md). The older synthetic bank-only pack remains available as a simpler parser example.
+
 ## Rehearsal
 
 1. Choose **Try synthetic document pack** for six fictional monthly bank PDFs. These fixtures contain no personal source data. Downloadable PDFs also exercise manual file upload.

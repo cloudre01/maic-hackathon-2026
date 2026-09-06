@@ -2,8 +2,8 @@
 
 ## Completed checks
 
-- 31 Python tests passed: existing financial/model tests plus document upload, exact-file deduplication, ledger reconciliation, mixed accounts, gaps, overlapping statements, review confirmations, evidence provenance and supporting-record separation.
-- Browser scenarios cover policy edits and reassessment/history, business and short-history outcomes, six benchmark experiments, mobile overflow, CSV upload, document review-to-assessment and mobile PDF upload/discard.
+- 43 Python tests passed: financial/model tests, document ingestion, evidence matching and duplicate/conflict handling, obligation floors, all three comparison stages, saved provenance, preview behaviour and cached-source audit rejection checks.
+- Eight browser scenarios passed, including the complete alternative-evidence comparison and saved history, plus the original scenarios, benchmark, CSV/PDF intake and mobile checks.
 - TypeScript type checking passed. Next.js optimized production build passed.
 - Desktop layout and 390px mobile layout inspected. Mobile document width equals viewport width; CSV and assessment controls remain accessible.
 - Source archive downloaded from UCI, audited, and fingerprinted. Six fitted model/calibration bundles reproduce their recorded held-out predictions.

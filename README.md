@@ -29,6 +29,8 @@ This is a local demonstration with no authentication, encryption-at-rest, lender
 
 ## Demonstration walkthrough
 
+For the main multi-source pitch, open **Document intake → Try Aina’s alternative-data story**. The [alternative-evidence demo guide](docs/ALTERNATIVE_EVIDENCE_DEMO.md) walks through nine fictional documents, analyst-confirmed matches, repayment schedules and the before/after comparison. [Training data audit](docs/TRAINING_DATA_AUDIT.md) explains preprocessing and source readiness.
+
 1. Select **Irregular-income worker** and run an assessment. Six complete months produce RM1,195 monthly repayment capacity under the initial demonstration policy, versus approximately RM711 requested repayment. Malaysian default probability remains unavailable.
 2. Inspect the income/cost chart, review points, reason codes and monthly calculations. Open **Policy** to see every stress assumption.
 3. Choose **Add next demo month**. The history expands to seven months and a new record links to the previous assessment.

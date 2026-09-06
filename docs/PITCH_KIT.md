@@ -1,6 +1,6 @@
 # Arus: live pitch and demo kit
 
-Prepared 6 September 2026. This kit describes the implemented local prototype. Personas and demonstration transactions are fictional. Customer demand, time savings and lending uplift remain hypotheses to validate.
+Prepared 6 September 2026. Updated after implementing priorities 1–4. Use [the current coherent alternative-evidence walkthrough](ALTERNATIVE_EVIDENCE_DEMO.md) for the live demo. This kit describes the implemented local prototype. Personas and demonstration transactions are fictional. Customer demand, time savings and lending uplift remain hypotheses to validate.
 
 ## The positioning
 
@@ -41,7 +41,7 @@ Choose **Aina as the main story**, Dapur Nuri as a short second case, and Ravi o
 | PayLater screenshots | Local OCR of selected headings/transaction facts, with review warnings | Supporting evidence for reviewing commitments; analyst declares total monthly debt | Complete outstanding debt, verified repayment purpose or on-time payment without due-date evidence |
 | Household needs and existing debt declared by applicant/analyst | Editable inputs, retained in the assessment | Protects household needs and accounts for commitments outside the observed account | Independently verified liabilities |
 
-**Critical distinction:** bank ledger rows drive the document-based cash-flow calculation. Bills and screenshots are retained separately and do not create extra expenses that would duplicate bank payments. The app does not currently reconcile every supporting bill to its matching bank transaction automatically.
+**Critical distinction:** bank ledger rows drive the document-based cash-flow calculation. Bills and screenshots are retained separately and do not create extra expenses that would duplicate bank payments. The app now proposes amount/date/reference matches for the documented Arus structured evidence template. Analyst confirmation reclassifies existing bank rows. Generic TNB/Grab/PayLater layouts still retain only the previously supported facts when schedule fields are unavailable.
 
 The business scenario includes fictional DuitNow merchant-settlement descriptions. That demonstrates the intended normalized transaction representation; it is not an implemented DuitNow connector. Similarly, a fictional platform payout is not evidence that we have integrated with Grab's driver platform.
 
@@ -66,7 +66,7 @@ The built-in **Add next demo month** flow links assessments. The document intake
 
 The comparison uses credit limit alone versus credit limit plus repayment/bill/payment history. Credit limit alone is a deliberately limited comparator, not a complete conventional credit scorecard. These results do not validate Malaysian bank cash flow, utility bills, screenshots or additional approvals for rejected applicants.
 
-**Not implemented:** validated Malaysian default scores, automatic bill-to-bank matching, live financial connectors, general bank-PDF parsing, identity/authenticity/fraud checks, production authentication or encryption at rest, automatic lending, and proven predictive uplift from local alternative data. Home Credit has not been trained; reuse permissions remain unconfirmed.
+**Not implemented:** validated Malaysian default scores, automatic source verification or arbitrary provider-format bill matching, live financial connectors, general bank-PDF parsing, identity/authenticity/fraud checks, production authentication or encryption at rest, automatic lending, and proven predictive uplift from local alternative data. Home Credit has not been trained; reuse permissions remain unconfirmed.
 
 ## A 90-second pitch you can say aloud
 
@@ -100,9 +100,9 @@ For a business-focused audience, replace the short-history segment with **Season
 
 ### Important presentational gap
 
-The included public-safe document pack currently contains bank PDFs only. TNB, Grab and PayLater ingestion was checked locally against supplied private examples, but those files should not be shown to judges. Do not claim the synthetic pack demonstrates every supported input.
+The original bank-only pack remains available. The new **Try Aina’s alternative-data story** contains six bank PDFs plus earnings, utility payments and a PayLater schedule, all independently fictional. It exercises the documented Arus template, not arbitrary provider adapters. Personal files should not be shown to judges.
 
-Before a broad multi-document stage demo, prepare independently fictional supporting bills/screenshots, clearly labelled as such, and rehearse their upload. Do not create them by changing a few names on the private originals: identifiers, balances, dates and merchant details can still disclose personal information. Until that public-safe pack is ready, show the supported-evidence matrix and demonstrate bank intake live.
+Use the new coherent pack to show 18 confirmed matches and four unmatched records. Compare capacity before confirmation (RM0), after confirmed matches (RM1,195) and after the schedule floor (RM945). The unmatched payout never becomes extra income. Follow ALTERNATIVE_EVIDENCE_DEMO.md for exact clicks; this supersedes the older generic intake segment below.
 
 ### Two-minute version
 
@@ -138,7 +138,7 @@ Skip benchmark charts, history export and policy editing in this version. A clea
 
 **“How do alternative sources change the answer today?”**
 
-“Reviewed bank transactions change recognized income, costs and capacity. Supporting bills and screenshots inform analyst review and declared commitments, but do not yet supply trained predictive features. We avoid counting the same payment twice.”
+“Confirmed structured earnings records can reclassify existing bank credits as income. Confirmed utility records can identify household payments, and confirmed repayment schedules can raise the debt floor. We show each impact separately without adding duplicate cash entries. Generic screenshots still require conservative review when necessary fields are absent. These are evidence-based policy changes, not trained predictive features.”
 
 **“Can a borrower upload fake statements?”**
 
@@ -172,9 +172,9 @@ Skip benchmark charts, history export and policy editing in this version. A clea
 
 | Priority | Deliverable | Acceptance evidence |
 | --- | --- | --- |
-| Before a multi-source stage demo | Public-safe fictional bank, utility and PayLater evidence for one coherent applicant; rehearse exact upload and result | Every file is independently fictional; all shown facts parse; totals and declared commitments agree; no private records on screen |
+| Implemented; rehearse before stage | Nine-file fictional bank/earnings/utility/PayLater pack with comparison | Exact expected results and limitations in ALTERNATIVE_EVIDENCE_DEMO.md |
 | Before claiming a workflow advantage | Observe a lending team's present review process; agree a comparison task | Measured extraction corrections, processing time, analyst review time and missing-evidence rates; report sample size |
-| Next product increment | Match supporting payments to bank rows with explicit uncertainty; improve debt schedule capture | Unmatched/ambiguous records visible; no double counting; changes traceable |
+| Implemented for documented template; expand next | Analyst-confirmed matching, debt schedules and saved comparison | Unmatched/ambiguous records visible; no double counting; changes traceable; additional provider adapters remain future work |
 | Next coverage increment | More tested statement layouts and multi-account reconciliation | Document-level regression fixtures; self-transfers handled; ownership/source uncertainty remains visible |
 | Next research milestone | Permitted local application-time evidence linked to later repayment outcomes | Defined outcome/horizon, dates, borrower-disjoint evaluation and worker/business subgroup reporting; no promised uplift |
 | Before deployment with customers | Authentication, access controls, encryption, retention/deletion, consent/provenance and operational review | Security and data-handling review appropriate to the deployment; not merely a successful local demo |
