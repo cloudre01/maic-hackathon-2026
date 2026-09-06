@@ -11,7 +11,35 @@ from .demos import SCENARIOS, scenario
 from . import storage
 
 app = FastAPI(title="Arus · alternative-credit prototype", version="0.1.0")
+from .document_routes import router as document_router
+
+app.include_router(document_router)
 ROOT = Path(__file__).resolve().parents[1]
+
+
+@app.middleware("http")
+async def local_privacy(request, call_next):
+    origin = request.headers.get("origin")
+    if (
+        request.method not in ("GET", "HEAD", "OPTIONS")
+        and origin
+        and origin
+        not in (
+            "http://127.0.0.1:3000",
+            "http://localhost:3000",
+            "http://127.0.0.1:8000",
+            "http://localhost:8000",
+        )
+    ):
+        from fastapi.responses import JSONResponse
+
+        return JSONResponse(
+            {"detail": "Cross-origin writes are disabled."}, status_code=403
+        )
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
 
 
 @app.get("/api/health")
@@ -36,10 +64,18 @@ def demo(scenario_id: str, extended: bool = False):
 def demo_csv(scenario_id: str, extended: bool = False):
     request = demo(scenario_id, extended)
     buffer = io.StringIO()
-    writer = csv.DictWriter(buffer, fieldnames=list(request.transactions[0].model_dump()))
+    writer = csv.DictWriter(
+        buffer, fieldnames=list(request.transactions[0].model_dump())
+    )
     writer.writeheader()
     writer.writerows([t.model_dump(mode="json") for t in request.transactions])
-    return Response(buffer.getvalue(), media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="simulated-{scenario_id}.csv"'})
+    return Response(
+        buffer.getvalue(),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="simulated-{scenario_id}.csv"'
+        },
+    )
 
 
 @app.post("/api/transactions/parse")
@@ -50,9 +86,18 @@ async def parse_csv(file: UploadFile = File(...)):
     try:
         content = raw.decode("utf-8-sig")
         reader = csv.DictReader(io.StringIO(content))
-        required = {"transaction_id", "date", "amount", "description", "category", "balance"}
+        required = {
+            "transaction_id",
+            "date",
+            "amount",
+            "description",
+            "category",
+            "balance",
+        }
         if set(reader.fieldnames or []) != required:
-            raise ValueError("Expected exactly these columns: " + ", ".join(sorted(required)))
+            raise ValueError(
+                "Expected exactly these columns: " + ", ".join(sorted(required))
+            )
         rows = []
         for line, row in enumerate(reader, 2):
             if len(rows) >= 20000:
@@ -64,10 +109,17 @@ async def parse_csv(file: UploadFile = File(...)):
             try:
                 rows.append(Transaction.model_validate(row))
             except ValidationError:
-                raise ValueError(f"Invalid transaction on line {line}. Check ISO date, finite numeric amounts and allowed category.")
+                raise ValueError(
+                    f"Invalid transaction on line {line}. Check ISO date, finite numeric amounts and allowed category."
+                )
         if not rows:
             raise ValueError("CSV contains no transactions.")
-        return {"transactions": rows, "count": len(rows), "earliest": min(t.date for t in rows), "latest": max(t.date for t in rows)}
+        return {
+            "transactions": rows,
+            "count": len(rows),
+            "earliest": min(t.date for t in rows),
+            "latest": max(t.date for t in rows),
+        }
     except (ValueError, UnicodeDecodeError, csv.Error) as exc:
         raise HTTPException(422, str(exc))
 
@@ -78,8 +130,13 @@ def create_assessment(request: AssessmentRequest):
         previous = storage.get(request.previous_assessment_id)
         if not previous:
             raise HTTPException(404, "Previous assessment not found.")
-        if previous["applicant"]["name"] != request.applicant.name or previous["applicant"]["kind"] != request.applicant.kind:
-            raise HTTPException(422, "Reassessment must refer to the same applicant name and type.")
+        if (
+            previous["applicant"]["name"] != request.applicant.name
+            or previous["applicant"]["kind"] != request.applicant.kind
+        ):
+            raise HTTPException(
+                422, "Reassessment must refer to the same applicant name and type."
+            )
     try:
         result = assess(request)
     except ValueError as exc:
@@ -104,5 +161,8 @@ def get_assessment(record_id: str):
 def benchmark():
     path = ROOT / "artifacts/benchmark.json"
     if not path.exists():
-        return {"status": "not_run", "message": "No benchmark has been run. Results are never simulated. Run python -m benchmark.train."}
+        return {
+            "status": "not_run",
+            "message": "No benchmark has been run. Results are never simulated. Run python -m benchmark.train.",
+        }
     return json.loads(path.read_text())

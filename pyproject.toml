@@ -3,10 +3,20 @@ name = "arus-credit"
 version = "0.1.0"
 requires-python = ">=3.11,<3.14"
 dependencies = [
-  "fastapi>=0.115,<1", "uvicorn>=0.34,<1", "python-multipart>=0.0.20",
-  "pandas>=2.2,<3", "numpy>=2,<3", "scikit-learn>=1.6,<2",
-  "xgboost>=3,<4", "catboost>=1.2.8,<2", "xlrd>=2", "httpx>=0.28",
-  "pytest>=8,<10"
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
+  "python-multipart>=0.0.20",
+  "pandas>=2.2,<3",
+  "numpy>=2,<3",
+  "scikit-learn>=1.6,<2",
+  "xgboost>=3,<4",
+  "catboost>=1.2.8,<2",
+  "xlrd>=2",
+  "httpx>=0.28",
+  "pytest>=8,<10",
+  "pypdf>=6.17.0",
+  "reportlab>=5.0.1",
+  "pillow>=12.3.0",
 ]
 
 [tool.pytest.ini_options]
