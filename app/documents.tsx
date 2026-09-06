@@ -12,6 +12,11 @@ import {
   Trash2,
 } from "lucide-react";
 import "./documents.css";
+import {
+  EvidenceReview,
+  EvidenceComparison,
+  type Comparison,
+} from "./evidence-review";
 
 type Tx = {
   transaction_id: string;
@@ -47,6 +52,7 @@ const categories = [
 ];
 const labels: Record<string, string> = {
   bank_statement: "Bank statement",
+  structured_evidence: "Earnings / payment schedule",
   utility_bill: "Utility bill",
   paylater_history: "PayLater history",
   grab_activity: "Grab activity",
@@ -83,6 +89,12 @@ export default function DocumentWorkspace({
     [query, setQuery] = useState(""),
     [page, setPage] = useState(0),
     [filter, setFilter] = useState("all");
+  const [confirmedMatches, setConfirmedMatches] = useState<
+    Record<string, string>
+  >({});
+  const [confirmedDebt, setConfirmedDebt] = useState<string[]>([]);
+  const [comparison, setComparison] = useState<Comparison | null>(null);
+  const [previewKey, setPreviewKey] = useState("");
   const [checks, setChecks] = useState([false, false, false, false]);
   const [applicant, setApplicant] = useState({
     name: "Private applicant",
@@ -128,7 +140,18 @@ export default function DocumentWorkspace({
       (d.kind === "unsupported" ||
         (d.kind === "bank_statement" && !d.reconciled)),
   );
+  const currentKey = JSON.stringify({
+    selected,
+    edits,
+    applicant,
+    policy,
+    confirmedMatches,
+    confirmedDebt,
+  });
   function accept(b: Batch) {
+    setComparison(null);
+    setConfirmedMatches({});
+    setConfirmedDebt([]);
     setBatch(b);
     setSelected(
       b.documents.filter((d) => d.kind !== "unsupported").map((d) => d.id),
@@ -169,6 +192,28 @@ export default function DocumentWorkspace({
       setBusy(false);
     }
   }
+  async function alternativeDemo() {
+    setBusy(true);
+    setError("");
+    try {
+      accept(
+        await api<Batch>("/api/documents/alternative-demo", { method: "POST" }),
+      );
+      setApplicant({
+        name: "Aina Rahman",
+        kind: "worker",
+        purpose: "Laptop and work equipment",
+        requested_amount: 8000,
+        tenure_months: 12,
+        household_expenses: 1600,
+        monthly_obligations: 250,
+      });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
   async function discard() {
     if (!batch) return;
     setBusy(true);
@@ -182,30 +227,40 @@ export default function DocumentWorkspace({
       setBusy(false);
     }
   }
-  async function assess() {
+  async function assess(preview = false) {
     if (!batch) return;
     setBusy(true);
     setError("");
     try {
-      const result = await api(`/api/documents/${batch.id}/assess`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          applicant,
-          policy,
-          selected_document_ids: selected,
-          categories: Object.fromEntries(
-            Object.entries(edits).filter(([key]) =>
-              rows.some((t) => t.transaction_id === key),
+      const result = await api<{ evidence_comparison: Comparison }>(
+        `/api/documents/${batch.id}/assess${preview ? "?preview=true" : ""}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            applicant,
+            policy,
+            selected_document_ids: selected,
+            categories: Object.fromEntries(
+              Object.entries(edits).filter(([key]) =>
+                rows.some((t) => t.transaction_id === key),
+              ),
             ),
-          ),
-          acknowledged: checks[0],
-          single_account_confirmed: checks[1],
-          period_confirmed: checks[2],
-          additional_obligations_confirmed: checks[3],
-        }),
-      });
-      onAssessment(result);
+            acknowledged: checks[0],
+            single_account_confirmed: checks[1],
+            period_confirmed: checks[2],
+            additional_obligations_confirmed: checks[3],
+            confirmed_matches: confirmedMatches,
+            confirmed_debt_ids: confirmedDebt,
+          }),
+        },
+      );
+      if (preview) {
+        setComparison(result.evidence_comparison);
+        setPreviewKey(currentKey);
+      } else {
+        onAssessment(result);
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -273,6 +328,12 @@ export default function DocumentWorkspace({
           />
         </label>
         <div>
+          <button className="primary" disabled={busy} onClick={alternativeDemo}>
+            Try Aina’s alternative-data story
+          </button>
+          <a href="/api/documents/alternative-demo.zip" className="text-button">
+            Download Aina’s fictional evidence
+          </a>
           <button className="text-button" disabled={busy} onClick={demo}>
             Try synthetic document pack <ArrowRight size={14} />
           </button>
@@ -470,6 +531,21 @@ export default function DocumentWorkspace({
               Next rows
             </button>
           </div>
+          <EvidenceReview
+            batchId={batch.id}
+            selected={selected}
+            hidden={hidden}
+            matches={confirmedMatches}
+            debtIds={confirmedDebt}
+            onMatches={(v) => {
+              setConfirmedMatches(v);
+              setChecks([false, false, false, false]);
+            }}
+            onDebt={(v) => {
+              setConfirmedDebt(v);
+              setChecks([false, false, false, false]);
+            }}
+          />
           <section className="doc-application">
             <h3>03 · Confirm the application & obligations</h3>
             <p className="muted">
@@ -616,7 +692,7 @@ export default function DocumentWorkspace({
           <button
             className="primary"
             disabled={busy || !checks.every(Boolean) || !rows.length || blocked}
-            onClick={assess}
+            onClick={() => assess(false)}
           >
             {busy ? (
               <LoaderCircle size={17} className="spin" />
@@ -625,6 +701,21 @@ export default function DocumentWorkspace({
             )}
             Calculate reviewed assessment
           </button>
+          <button
+            className="secondary"
+            disabled={busy || !checks.every(Boolean) || !rows.length || blocked}
+            onClick={() => assess(true)}
+          >
+            Compare evidence impact
+          </button>
+          {comparison &&
+            (previewKey === currentKey ? (
+              <EvidenceComparison value={comparison} hidden={hidden} />
+            ) : (
+              <p role="status">
+                Evidence or inputs changed. Run the comparison again.
+              </p>
+            ))}
           {blocked && (
             <p role="status" className="doc-warning">
               Exclude unsupported or unreconciled documents to continue.

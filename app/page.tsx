@@ -1,6 +1,7 @@
 "use client";
 
 import DocumentWorkspace from "./documents";
+import { EvidenceComparison, type Comparison } from "./evidence-review";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -67,6 +68,7 @@ type Monthly = {
   count: number;
 };
 type Assessment = {
+  evidence_comparison?: Comparison;
   id: string;
   inputs: RequestData;
   created_at: string;
@@ -180,12 +182,10 @@ const policyDefaults: Policy = {
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init);
   if (!res.ok) {
-    const data = await res
-      .json()
-      .catch(() => ({
-        detail:
-          "Service unavailable. Check that the assessment service is running.",
-      }));
+    const data = await res.json().catch(() => ({
+      detail:
+        "Service unavailable. Check that the assessment service is running.",
+    }));
     throw new Error(
       typeof data.detail === "string"
         ? data.detail
@@ -1151,6 +1151,9 @@ export default function Page() {
                           </ol>
                         </section>
                       </div>
+                      {a.evidence_comparison && (
+                        <EvidenceComparison value={a.evidence_comparison} />
+                      )}
                       <details className="ledger">
                         <summary>
                           Monthly calculations & audit trail
