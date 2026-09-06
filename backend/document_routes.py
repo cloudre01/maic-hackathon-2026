@@ -8,6 +8,8 @@ from pydantic import Field
 from .schemas import StrictModel, Applicant, Policy, AssessmentRequest
 from .cashflow import assess
 from . import documents, storage
+from . import evidence, evidence_demo
+from copy import deepcopy
 
 router = APIRouter(prefix="/api/documents")
 
@@ -85,10 +87,38 @@ class Review(StrictModel):
     single_account_confirmed: bool = False
     period_confirmed: bool = False
     additional_obligations_confirmed: bool = False
+    confirmed_matches: dict[str, str] = Field(default_factory=dict)
+    confirmed_debt_ids: list[str] = Field(default_factory=list, max_length=500)
+
+
+@router.post('/alternative-demo')
+def alternative_demo():
+    return documents.persist_batch([documents.parse_document(raw,name) for name,raw in evidence_demo.pack()],simulated=True)
+
+
+@router.get('/alternative-demo.zip')
+def alternative_download():
+    stream=io.BytesIO()
+    with zipfile.ZipFile(stream,'w') as archive:
+        for name,raw in evidence_demo.pack(): archive.writestr(name,raw)
+    return Response(stream.getvalue(),media_type='application/zip',headers={'Content-Disposition':'attachment; filename="aina-fictional-evidence.zip"'})
+
+
+class Selection(StrictModel):
+    selected_document_ids: list[str] = Field(min_length=1,max_length=16)
+
+
+@router.post('/{batch_id}/matches')
+def matches(batch_id:str, selection:Selection):
+    batch=documents.load_batch(batch_id)
+    if not batch: raise HTTPException(404,'Document batch not found.')
+    chosen=set(selection.selected_document_ids)
+    if not chosen.issubset({d['id'] for d in batch['documents']}): raise HTTPException(422,'Unknown document selection.')
+    return {'items':evidence.propose([d for d in batch['documents'] if d['id'] in chosen])}
 
 
 @router.post("/{batch_id}/assess")
-def assessed_document_batch(batch_id: str, review: Review):
+def assessed_document_batch(batch_id: str, review: Review, preview: bool = False):
     batch = documents.load_batch(batch_id)
     if not batch:
         raise HTTPException(404, "Document batch not found.")
@@ -181,11 +211,30 @@ def assessed_document_batch(batch_id: str, review: Review):
             simulated=batch["simulated"],
         )
         result = assess(request)
-    except ValueError:
+        baseline = deepcopy(result)
+        base_request = request.model_dump(mode='json')
+        items = evidence.propose(docs)
+        matched_tx = deepcopy(tx)
+        evidence_changes = evidence.apply_matches(matched_tx,items,review.confirmed_matches)
+        matched_request = request.model_copy(update={'transactions': [type(request.transactions[0]).model_validate(t) for t in matched_tx]})
+        matched_result = assess(matched_request)
+        debt = evidence.debt_summary(items,review.confirmed_debt_ids)
+        effective_debt = max(review.applicant.monthly_obligations,debt['suggested_monthly_floor'])
+        request = matched_request.model_copy(update={'applicant':review.applicant.model_copy(update={'monthly_obligations':effective_debt})})
+        result = assess(request)
+    except ValueError as exc:
         raise HTTPException(
             422,
-            "Check category signs, financing inputs and statement dates. Income must be positive; expense, household and debt must be negative.",
+            "Evidence or application review failed: " + str(exc),
         )
+    def snapshot(label,r):
+        return {'label':label,'status':r['status'],'metrics':r['metrics'],'input_hash':r['input_hash'],'flags':r['flags']}
+    result['evidence_comparison'] = {
+        'stages':[snapshot('Bank categories + declared obligations',baseline),snapshot('Confirmed bank matches',matched_result),snapshot('Confirmed matches + schedule floor',result)],
+        'category_changes':evidence_changes,'debt_review':debt,
+        'declared_monthly_obligations':review.applicant.monthly_obligations,'effective_monthly_obligations':effective_debt,
+        'baseline_inputs':base_request,
+        'note':'Same bank rows, applicant financing and stress policy. Stage 2 changes only analyst-confirmed categories. Stage 3 raises the debt floor if confirmed schedules exceed declared debt. This is an affordability sensitivity comparison, not predictive uplift.'}
     result["document_evidence"] = {
         "batch_id": batch_id,
         "parser_version": documents.PARSER_VERSION,
@@ -202,6 +251,10 @@ def assessed_document_batch(batch_id: str, review: Review):
             "text": "Only reviewed bank ledger rows feed cash flow. Supporting bill and screenshot evidence is retained separately. Analyst-confirmed household and debt floors must cover obligations not visible in the bank account. Document authenticity and repayment punctuality are not verified.",
         }
     )
+    if review.confirmed_debt_ids:
+        result['reasons'].append({'code':'SCHEDULE_FLOOR','text':f'Confirmed schedule peak RM {debt["suggested_monthly_floor"]:,.2f}; declared debt RM {review.applicant.monthly_obligations:,.2f}; effective monthly floor RM {effective_debt:,.2f}. Uses the greater of this floor and bank debt payments, not their sum.'})
+    if preview:
+        return result
     return storage.save(request, result)
 
 

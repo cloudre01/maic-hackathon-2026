@@ -20,7 +20,7 @@ from pypdf import PdfReader
 from PIL import Image
 from . import storage
 
-PARSER_VERSION = "documents-1.0"
+PARSER_VERSION = "documents-1.1"
 MONEY = r"\d[\d,]*\.\d{2}"
 ROW = re.compile(
     r"^\s*(\d{2}/\d{2}/\d{2})\s+(.+?)\s+(" + MONEY + r")([+-])\s+(-?" + MONEY + r")\s*$"
@@ -103,6 +103,8 @@ def bank(text, file_hash):
             when, description, amount, sign, balance = m.groups()
             value = numeric(amount) * (-1 if sign == "-" else 1)
             category = "unknown" if value > 0 else "expense"
+            if 'OWN ACCOUNT TRANSFER' in description.upper():
+                category = 'transfer'
             if "HOUSEHOLD" in description.upper() and value < 0:
                 category = "household"
             if re.search(r"\b(SALARY|PAYROLL)\b", description, re.I) and value > 0:
@@ -202,6 +204,10 @@ def bank(text, file_hash):
 
 
 def supporting(text):
+    from .evidence import parse_evidence
+    structured = parse_evidence(text)
+    if structured:
+        return structured
     facts = []
     warnings = []
     if "TNB" in text.upper() and ("TARIKH BIL" in text or "Baki Terdahulu" in text):
