@@ -30,6 +30,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score, brier_score_
 from sklearn.calibration import calibration_curve
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
+from .audit import audit_frame
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED = 2026
@@ -77,6 +78,7 @@ def train(rounds=200):
         xls = next(n for n in archive.namelist() if n.endswith(".xls"))
         df = pd.read_excel(io.BytesIO(archive.read(xls)), header=1)
     df.columns = [str(c).strip() for c in df.columns]
+    source_quality = audit_frame(df)
     target = "default payment next month"
     if len(df) != 30000 or not df["ID"].is_unique or set(df[target].unique()) != {0, 1}:
         raise ValueError(
@@ -295,6 +297,7 @@ def train(rounds=200):
         "selection": "Two candidates per model and feature set; tune on validation AUC, Platt-calibrate on separate validation subset; select final model by validation AUC.",
         "split_method": "60/20/20 approximately stratified, grouped by identical permitted feature profiles. No reliable borrower application dates; this is not temporal validation.",
         "audit": {
+            "source_quality": source_quality,
             "rows": len(df),
             "unique_ids": int(df.ID.nunique()),
             "adverse_outcomes": int(y.sum()),
