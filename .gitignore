@@ -9,3 +9,11 @@ data/
 !.env.example
 artifacts/models/
 test-results/
+# Personal source documents and local document-processing artifacts.
+/*.pdf
+/*.PNG
+/*.png
+/*.jpg
+/*.jpeg
+private/
+.local/
