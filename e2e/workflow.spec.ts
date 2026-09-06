@@ -1,4 +1,35 @@
 import { test, expect } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+
+test('PDF file chooser uploads a fictional statement on mobile',async({page})=>{
+  const encoded=execFileSync('.venv/bin/python',['-c','from backend.documents import demo_pack; import base64; print(base64.b64encode(demo_pack()[0][1]).decode())'],{encoding:'utf8'}).trim();
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  await page.getByRole('button',{name:'Document intake'}).click();
+  await page.getByLabel('Choose documents',{exact:true}).setInputFiles({name:'synthetic-bank.pdf',mimeType:'application/pdf',buffer:Buffer.from(encoded,'base64')});
+  await expect(page.getByText('Totals reconcile')).toBeVisible();
+  await expect(page.getByText('1 unique documents',{exact:false})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth)).toBe(false);
+  await page.getByRole('button',{name:'Discard review batch'}).click();
+  await expect(page.getByText('Totals reconcile')).toHaveCount(0);
+});
+
+test('document review flows through to a saved assessment',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Document intake'}).click();
+  await page.getByRole('button',{name:'Try synthetic document pack'}).click();
+  await expect(page.getByText('6 unique documents',{exact:false})).toBeVisible();
+  await expect(page.getByText('Totals reconcile')).toHaveCount(6);
+  const calculate=page.getByRole('button',{name:'Calculate reviewed assessment'});
+  await expect(calculate).toBeDisabled();
+  await page.getByRole('button',{name:'Reveal local values'}).click();
+  await expect(page.getByText('SALARY / CLIENT PAYOUT',{exact:true})).toHaveCount(6);
+  for(const checkbox of await page.locator('.doc-confirm input').all()) await checkbox.check();
+  await calculate.click();
+  await expect(page.getByRole('heading',{name:'Private applicant'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Within demo capacity'})).toBeVisible();
+  await expect(page.getByText('Default probability · Unavailable')).toBeVisible();
+});
 
 test('assess, change policy, reassess and inspect audit history',async({page})=>{
   await page.goto('/');
