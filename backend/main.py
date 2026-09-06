@@ -1,6 +1,8 @@
 import csv
 import io
 import json
+import os
+import secrets
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import Response
@@ -17,19 +19,55 @@ app.include_router(document_router)
 ROOT = Path(__file__).resolve().parents[1]
 
 
+LOCAL_ORIGINS = (
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+)
+# A deployed frontend proxies to this service under its own origin. Name it in
+# ARUS_ALLOWED_ORIGINS (comma separated) so writes from that origin pass the
+# guard below without disabling it for everyone else.
+ALLOWED_ORIGINS = LOCAL_ORIGINS + tuple(
+    origin.strip().rstrip("/")
+    for origin in os.getenv("ARUS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+)
+
+
+# A deployed service is reachable by anyone who finds the hostname. When
+# ARUS_API_TOKEN is set, every request except the health probe must present it
+# as a bearer token. The frontend proxy holds the value server-side, so it never
+# reaches the browser. Unset means no check, which keeps local runs unchanged.
+API_TOKEN = os.getenv("ARUS_API_TOKEN", "").strip()
+UNAUTHENTICATED_PATHS = ("/api/health",)
+
+
+@app.middleware("http")
+async def require_token(request, call_next):
+    if API_TOKEN and request.url.path not in UNAUTHENTICATED_PATHS:
+        header = request.headers.get("authorization", "")
+        scheme, _, presented = header.partition(" ")
+        if scheme.lower() != "bearer" or not secrets.compare_digest(
+            presented.strip(), API_TOKEN
+        ):
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(
+                {"detail": "Not authorised."},
+                status_code=401,
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    return await call_next(request)
+
+
 @app.middleware("http")
 async def local_privacy(request, call_next):
     origin = request.headers.get("origin")
     if (
         request.method not in ("GET", "HEAD", "OPTIONS")
         and origin
-        and origin
-        not in (
-            "http://127.0.0.1:3000",
-            "http://localhost:3000",
-            "http://127.0.0.1:8000",
-            "http://localhost:8000",
-        )
+        and origin.rstrip("/") not in ALLOWED_ORIGINS
     ):
         from fastapi.responses import JSONResponse
 

@@ -6,6 +6,12 @@ services:
     # Bound to loopback only; Caddy on the host terminates TLS and proxies here.
     ports:
       - "127.0.0.1:8000:8000"
+    environment:
+      # Origins allowed to make writes, comma separated. Set this to the
+      # deployed frontend, e.g. ARUS_ALLOWED_ORIGINS=https://arus.vercel.app
+      ARUS_ALLOWED_ORIGINS: ${ARUS_ALLOWED_ORIGINS:-}
+      # Shared secret the frontend proxy presents. Unset means no check.
+      ARUS_API_TOKEN: ${ARUS_API_TOKEN:-}
     volumes:
       - arus-data:/data
     healthcheck:
