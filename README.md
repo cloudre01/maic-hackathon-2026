@@ -4,7 +4,7 @@ A local lender workspace for workers with irregular income and microbusinesses. 
 
 ## Run locally
 
-Prerequisites: Python 3.12, Node.js 20.9+ and `uv`.
+Prerequisites: Python 3.12, Node.js 20.9+, `uv`, Poppler and Tesseract (`brew install poppler tesseract` on macOS).
 
 ```sh
 uv sync --frozen
@@ -25,7 +25,7 @@ npm run dev
 
 Open http://127.0.0.1:3000. API documentation: http://127.0.0.1:8000/docs. The frontend proxies `/api` to the local Python service. Override `ARUS_API_URL` if needed. `ARUS_DB` selects a different SQLite file. Defaults live in `data/arus.sqlite3`.
 
-This is a local demonstration with no authentication, encryption-at-rest, lender integration or identity verification. Use demonstration data; do not expose this service publicly. No browser data is sent to an LLM. The interface currently requests fonts from Google Fonts and falls back to local fonts offline.
+This is a local demonstration with no authentication, encryption-at-rest, lender integration or identity verification. Use fictional data for public demos; do not expose this service publicly. Document extraction and OCR run locally. Fonts are bundled locally. Extracted evidence persists in the ignored local database. See [Document demo guide](docs/DOCUMENTS.md).
 
 ## Demonstration walkthrough
 
@@ -78,4 +78,4 @@ Browser regression cases are in `e2e/workflow.spec.ts`. With both services runni
 - `tests/`, `e2e/`: financial calculation/API checks and browser regression scenarios.
 - `docs/`: input contract, methodology and limitations.
 
-No real approvals, lending, pricing offers, fraud classification, PDF extraction, live connectors or synthetic model-training data are included.
+No real approvals, lending, pricing offers, fraud classification, arbitrary PDF layouts, live connectors or synthetic model-training data are included.
